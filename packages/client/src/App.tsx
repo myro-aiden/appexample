@@ -11,8 +11,8 @@ function App() {
   }, []);
   return (
     <div className='p-8'>
-    <p className="font-bold text-3xl">{message}</p>
-    <Button>Click</Button>
+      <p className="font-bold text-3xl">{message}</p>
+      <Button>Click me</Button>
     </div>
   );
 }

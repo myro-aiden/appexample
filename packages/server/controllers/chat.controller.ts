@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
-import { chatService } from '../services/chat.service';
 import z from 'zod';
+import { chatService } from '../services/chat.service';
 
-//implementation detail / keep private
+// implementation detail / keep private
 const chatSchema = z.object({
    prompt: z
       .string()
@@ -12,9 +12,15 @@ const chatSchema = z.object({
    conversationID: z.uuid(),
 });
 
-//public interface
+// public interface
 export const chatController = {
    async sendMessage(req: Request, res: Response) {
+      const parseResult = chatSchema.safeParse(req.body);
+      if (!parseResult.success) {
+         res.status(400).json(parseResult.error?.format());
+         return;
+      }
+
       try {
          const { prompt, conversationId } = req.body;
          const response = await chatService.sendMessage(prompt, conversationId);
@@ -25,22 +31,5 @@ export const chatController = {
             error: 'Internal Server Error, failed to generate response',
          });
       }
-
-      const parseResult = chatSchema.safeParse(req.body);
-      if (!parseResult.success) {
-         res.status(400).json(parseResult.error?.format());
-         return;
-      }
-
-      const response = await client.responses.create({
-         model: 'gpt-4.1-nano',
-         input: prompt,
-         temperature: 0.2,
-         max_output_tokens: 50,
-         previous_response_id: conversations.get(conversationID),
-      });
-
-      conversations.set(conversationID, response.id);
-      res.json({ message: response.output_text });
    },
 };

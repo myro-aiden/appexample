@@ -1,24 +1,24 @@
 import express from 'express';
-import type { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { chatController } from './controllers/chat.controller';
+import router from './routes';
+import cors from 'cors';
 
 dotenv.config();
 
+//Create app
 const app = express();
+// Enable CORS for all routes (or specify origins)
+app.use(
+   cors({
+      origin: 'http://localhost:5173', // your Vite client port
+   })
+);
+//Middleware to parse JSON bodies
 app.use(express.json());
+app.use(router);
+//Initialize port / server
 const port = process.env.PORT || 3000;
-
-app.get('/', (req: Request, res: Response) => {
-   res.send('Hello from the server! yer');
-});
-
-app.get('/api/hello', (req: Request, res: Response) => {
-   res.json({ message: 'Hello from the server! yer' });
-});
-
-app.post('/api/chat', chatController.sendMessage);
-
+//Start server / app
 app.listen(port, () => {
    console.log(`Server is running at http://localhost:${port}`);
 });

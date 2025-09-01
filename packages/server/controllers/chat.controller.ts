@@ -9,7 +9,7 @@ const chatSchema = z.object({
       .trim()
       .min(1, 'Prompt is required.')
       .max(1000, 'Prompt is too long. Max 1000 characters.'),
-   conversationID: z.uuid(),
+   conversationId: z.uuid(),
 });
 
 // public interface
@@ -17,7 +17,8 @@ export const chatController = {
    async sendMessage(req: Request, res: Response) {
       const parseResult = chatSchema.safeParse(req.body);
       if (!parseResult.success) {
-         res.status(400).json(parseResult.error?.format());
+         const formatted = z.treeifyError(parseResult.error);
+         res.status(400).json(formatted);
          return;
       }
 
